@@ -5,10 +5,11 @@ const authMiddleware = require('../middleware/authMiddleware');
 
 router.use(authMiddleware);
 
+// NOTE: /summary MUST come before /:id to avoid route shadowing
+router.get('/summary', expenseController.getSummary);
 router.get('/', expenseController.getExpenses);
 router.post('/', expenseController.addExpense);
 router.put('/:id', expenseController.updateExpense);
 router.delete('/:id', expenseController.deleteExpense);
-router.get('/summary', expenseController.getSummary);
 
 module.exports = router;
