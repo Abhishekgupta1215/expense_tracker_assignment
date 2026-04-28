@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, ActivityIndicator, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ExpenseContext } from '../../../context/ExpenseContext';
@@ -48,8 +48,8 @@ export default function EditExpense() {
 
   const handleDelete = () => {
     Alert.alert(
-      'Delete Expense',
-      'Are you sure you want to delete this expense?',
+      'Delete Transaction',
+      'Are you sure you want to delete this specific transaction?',
       [
         { text: 'Cancel', style: 'cancel' },
         { 
@@ -73,27 +73,29 @@ export default function EditExpense() {
   if (!expense) return null;
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-[#121212]">
+      <StatusBar barStyle="light-content" backgroundColor="#121212" />
       {/* Header */}
-      <View className="px-6 py-4 flex-row items-center border-b border-gray-100 justify-between">
+      <View className="px-5 py-4 flex-row items-center border-b border-[#1C1C1E] justify-between">
         <TouchableOpacity onPress={() => router.back()} className="p-2 -ml-2">
-          <ArrowLeft size={24} color="#111827" />
+          <ArrowLeft size={24} color="#FFF" />
         </TouchableOpacity>
-        <Text className="text-xl font-bold text-gray-900">Edit Expense</Text>
-        <TouchableOpacity onPress={handleDelete} className="p-2 -mr-2 bg-red-50 rounded-full">
-          <Trash2 size={20} color="#EF4444" />
+        <Text className="text-xl font-bold text-white">Edit Transaction</Text>
+        <TouchableOpacity onPress={handleDelete} className="p-2 -mr-2 bg-[#FA4A4D]/10 rounded-full">
+          <Trash2 size={20} color="#FA4A4D" />
         </TouchableOpacity>
       </View>
 
-      <ScrollView className="flex-1 px-6 pt-6" showsVerticalScrollIndicator={false}>
+      <ScrollView className="flex-1 px-5 pt-6" showsVerticalScrollIndicator={false}>
         {/* Amount Input */}
-        <View className="items-center mb-8">
-          <Text className="text-gray-500 mb-2">Amount</Text>
+        <View className="items-center mb-10">
+          <Text className="text-gray-400 mb-2 font-medium">Amount</Text>
           <View className="flex-row items-center">
-            <Text className="text-4xl font-bold text-gray-900 mr-1">$</Text>
+            <Text className="text-4xl font-bold text-white mr-1">₹</Text>
             <TextInput
-              className="text-5xl font-extrabold text-gray-900"
+              className="text-5xl font-extrabold text-[#007AFF]"
               placeholder="0.00"
+              placeholderTextColor="#2A2A2D"
               keyboardType="numeric"
               value={amount}
               onChangeText={setAmount}
@@ -102,47 +104,51 @@ export default function EditExpense() {
         </View>
 
         {/* Category Picker */}
-        <View className="mb-6">
+        <View className="mb-8">
           <View className="flex-row items-center mb-3">
-            <Tag size={18} color="#6B7280" className="mr-2" />
-            <Text className="text-gray-700 font-semibold text-base">Category</Text>
+            <Tag size={18} color="#9CA3AF" className="mr-2" />
+            <Text className="text-gray-300 font-semibold text-base">Category</Text>
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
             {CATEGORIES.map(cat => (
               <TouchableOpacity
                 key={cat}
                 onPress={() => setCategory(cat)}
-                className={`py-2 px-4 rounded-full mr-3 border ${category === cat ? 'bg-black border-black' : 'bg-white border-gray-200'}`}
+                className={`py-2 px-5 rounded-full mr-3 border ${category === cat ? 'bg-[#007AFF] border-[#007AFF]' : 'bg-[#1C1C1E] border-[#2A2A2D]'}`}
               >
-                <Text className={`${category === cat ? 'text-white' : 'text-gray-600'} font-medium`}>{cat}</Text>
+                <Text className={`${category === cat ? 'text-white' : 'text-gray-400'} font-medium`}>{cat}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
 
         {/* Note Input */}
-        <View className="mb-8">
+        <View className="mb-10">
           <View className="flex-row items-center mb-3">
-            <AlignLeft size={18} color="#6B7280" className="mr-2" />
-            <Text className="text-gray-700 font-semibold text-base">Note (Optional)</Text>
+            <AlignLeft size={18} color="#9CA3AF" className="mr-2" />
+            <Text className="text-gray-300 font-semibold text-base">Description</Text>
           </View>
-          <TextInput
-            className="bg-gray-50 rounded-xl px-4 py-3 text-gray-900 border border-gray-200"
-            placeholder="What was this for?"
-            multiline
-            numberOfLines={3}
-            textAlignVertical="top"
-            value={note}
-            onChangeText={setNote}
-          />
+          <View className="bg-[#1C1C1E] rounded-xl border border-[#2A2A2D]">
+            <TextInput
+              className="px-4 py-4 text-white text-base"
+              placeholder="Write a note (optional)"
+              placeholderTextColor="#6B7280"
+              multiline
+              numberOfLines={3}
+              textAlignVertical="top"
+              value={note}
+              onChangeText={setNote}
+            />
+          </View>
         </View>
 
         <TouchableOpacity
-          className="bg-black rounded-xl py-4 flex-row justify-center items-center shadow-md shadow-gray-300"
+          className="bg-[#007AFF] rounded-full py-4 flex-row justify-center items-center shadow-lg"
+          style={{ shadowColor: '#007AFF', elevation: 4 }}
           onPress={handleUpdate}
           disabled={loading}
         >
-          {loading ? <ActivityIndicator color="#fff" /> : <Text className="text-white font-bold text-lg">Update Expense</Text>}
+          {loading ? <ActivityIndicator color="#fff" /> : <Text className="text-white font-bold text-lg">Update Transaction</Text>}
         </TouchableOpacity>
         <View className="h-10" />
       </ScrollView>

@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, StatusBar } from 'react-native';
 import { Link } from 'expo-router';
 import { AuthContext } from '../../context/AuthContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -28,30 +28,33 @@ export default function Register() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white justify-center px-6">
-      <View className="mb-8 items-center">
-        <Text className="text-3xl font-bold text-gray-900 mb-2">Create Account</Text>
-        <Text className="text-gray-500">Sign up to get started</Text>
+    <SafeAreaView className="flex-1 bg-[#121212] justify-center px-6">
+      <StatusBar barStyle="light-content" backgroundColor="#121212" />
+      <View className="mb-10 items-center">
+        <Text className="text-4xl font-bold text-white mb-2 tracking-tight">PayGauge</Text>
+        <Text className="text-gray-500">Create an account to track expenses</Text>
       </View>
 
       <View className="space-y-4">
         {/* Name Input */}
-        <View className="flex-row items-center bg-gray-100 rounded-xl px-4 py-3 border border-gray-200">
-          <User color="#9CA3AF" size={20} className="mr-2" />
+        <View className="flex-row items-center bg-[#1C1C1E] rounded-xl px-4 py-4 border border-[#2A2A2D]">
+          <User color="#6B7280" size={20} className="mr-2" />
           <TextInput
-            className="flex-1 text-gray-900 text-base ml-2"
+            className="flex-1 text-white text-base ml-2"
             placeholder="Full Name"
+            placeholderTextColor="#6B7280"
             value={name}
             onChangeText={setName}
           />
         </View>
 
         {/* Email Input */}
-        <View className="flex-row items-center bg-gray-100 rounded-xl px-4 py-3 border border-gray-200 mt-4">
-          <Mail color="#9CA3AF" size={20} className="mr-2" />
+        <View className="flex-row items-center bg-[#1C1C1E] rounded-xl px-4 py-4 border border-[#2A2A2D] mt-4">
+          <Mail color="#6B7280" size={20} className="mr-2" />
           <TextInput
-            className="flex-1 text-gray-900 text-base ml-2"
+            className="flex-1 text-white text-base ml-2"
             placeholder="Email Address"
+            placeholderTextColor="#6B7280"
             keyboardType="email-address"
             autoCapitalize="none"
             value={email}
@@ -60,11 +63,12 @@ export default function Register() {
         </View>
 
         {/* Password Input */}
-        <View className="flex-row items-center bg-gray-100 rounded-xl px-4 py-3 border border-gray-200 mt-4">
-          <Lock color="#9CA3AF" size={20} className="mr-2" />
+        <View className="flex-row items-center bg-[#1C1C1E] rounded-xl px-4 py-4 border border-[#2A2A2D] mt-4">
+          <Lock color="#6B7280" size={20} className="mr-2" />
           <TextInput
-            className="flex-1 text-gray-900 text-base ml-2"
+            className="flex-1 text-white text-base ml-2"
             placeholder="Password"
+            placeholderTextColor="#6B7280"
             secureTextEntry
             value={password}
             onChangeText={setPassword}
@@ -73,22 +77,23 @@ export default function Register() {
       </View>
 
       <TouchableOpacity 
-        className="bg-black rounded-xl py-4 mt-8 flex-row justify-center items-center"
+        className="bg-[#007AFF] rounded-full py-4 mt-10 flex-row justify-center items-center shadow-lg"
+        style={{ shadowColor: '#007AFF', elevation: 4 }}
         onPress={handleRegister}
         disabled={loading}
       >
         {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text className="text-white font-bold text-lg">Create Account</Text>
+          <Text className="text-white font-bold text-lg">REGISTER</Text>
         )}
       </TouchableOpacity>
 
       <View className="flex-row justify-center mt-6">
-        <Text className="text-gray-600 font-medium">Already have an account? </Text>
+        <Text className="text-gray-500 font-medium">Already have an account? </Text>
         <Link href="/login" asChild>
           <TouchableOpacity>
-            <Text className="text-black font-bold">Sign In</Text>
+            <Text className="text-[#007AFF] font-bold">Sign In</Text>
           </TouchableOpacity>
         </Link>
       </View>
