@@ -1,0 +1,151 @@
+import React, { useState, useContext, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { ExpenseContext } from '../../../context/ExpenseContext';
+import { Trash2, Tag, AlignLeft, ArrowLeft } from 'lucide-react-native';
+
+const CATEGORIES = ['Food', 'Transport', 'Utilities', 'Entertainment', 'Shopping', 'Other'];
+
+export default function EditExpense() {
+  const router = useRouter();
+  const { id } = useLocalSearchParams();
+  const { expenses, updateExpense, deleteExpense } = useContext(ExpenseContext);
+  
+  const expense = expenses.find(e => e._id === id);
+
+  const [amount, setAmount] = useState(expense ? expense.amount.toString() : '');
+  const [category, setCategory] = useState(expense ? expense.category : CATEGORIES[0]);
+  const [note, setNote] = useState(expense && expense.note ? expense.note : '');
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!expense) {
+      router.back();
+    }
+  }, [expense]);
+
+  const handleUpdate = async () => {
+    if (!amount || isNaN(amount)) {
+      Alert.alert('Error', 'Please enter a valid amount');
+      return;
+    }
+    
+    setLoading(true);
+    const res = await updateExpense(id, {
+      amount: parseFloat(amount),
+      category,
+      note
+    });
+    setLoading(false);
+
+    if (res.success) {
+      router.back();
+    } else {
+      Alert.alert('Error', res.error || 'Failed to update expense');
+    }
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      'Delete Expense',
+      'Are you sure you want to delete this expense?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Delete', 
+          style: 'destructive',
+          onPress: async () => {
+            setLoading(true);
+            const res = await deleteExpense(id);
+            if (res.success) {
+              router.back();
+            } else {
+              setLoading(false);
+              Alert.alert('Error', res.error || 'Failed to delete expense');
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  if (!expense) return null;
+
+  return (
+    <SafeAreaView className="flex-1 bg-white">
+      {/* Header */}
+      <View className="px-6 py-4 flex-row items-center border-b border-gray-100 justify-between">
+        <TouchableOpacity onPress={() => router.back()} className="p-2 -ml-2">
+          <ArrowLeft size={24} color="#111827" />
+        </TouchableOpacity>
+        <Text className="text-xl font-bold text-gray-900">Edit Expense</Text>
+        <TouchableOpacity onPress={handleDelete} className="p-2 -mr-2 bg-red-50 rounded-full">
+          <Trash2 size={20} color="#EF4444" />
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView className="flex-1 px-6 pt-6" showsVerticalScrollIndicator={false}>
+        {/* Amount Input */}
+        <View className="items-center mb-8">
+          <Text className="text-gray-500 mb-2">Amount</Text>
+          <View className="flex-row items-center">
+            <Text className="text-4xl font-bold text-gray-900 mr-1">$</Text>
+            <TextInput
+              className="text-5xl font-extrabold text-gray-900"
+              placeholder="0.00"
+              keyboardType="numeric"
+              value={amount}
+              onChangeText={setAmount}
+            />
+          </View>
+        </View>
+
+        {/* Category Picker */}
+        <View className="mb-6">
+          <View className="flex-row items-center mb-3">
+            <Tag size={18} color="#6B7280" className="mr-2" />
+            <Text className="text-gray-700 font-semibold text-base">Category</Text>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
+            {CATEGORIES.map(cat => (
+              <TouchableOpacity
+                key={cat}
+                onPress={() => setCategory(cat)}
+                className={`py-2 px-4 rounded-full mr-3 border ${category === cat ? 'bg-black border-black' : 'bg-white border-gray-200'}`}
+              >
+                <Text className={`${category === cat ? 'text-white' : 'text-gray-600'} font-medium`}>{cat}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+
+        {/* Note Input */}
+        <View className="mb-8">
+          <View className="flex-row items-center mb-3">
+            <AlignLeft size={18} color="#6B7280" className="mr-2" />
+            <Text className="text-gray-700 font-semibold text-base">Note (Optional)</Text>
+          </View>
+          <TextInput
+            className="bg-gray-50 rounded-xl px-4 py-3 text-gray-900 border border-gray-200"
+            placeholder="What was this for?"
+            multiline
+            numberOfLines={3}
+            textAlignVertical="top"
+            value={note}
+            onChangeText={setNote}
+          />
+        </View>
+
+        <TouchableOpacity
+          className="bg-black rounded-xl py-4 flex-row justify-center items-center shadow-md shadow-gray-300"
+          onPress={handleUpdate}
+          disabled={loading}
+        >
+          {loading ? <ActivityIndicator color="#fff" /> : <Text className="text-white font-bold text-lg">Update Expense</Text>}
+        </TouchableOpacity>
+        <View className="h-10" />
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
