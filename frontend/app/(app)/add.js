@@ -39,26 +39,26 @@ export default function AddExpense() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-[#121212]">
-      <StatusBar barStyle="light-content" backgroundColor="#121212" />
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#03045e' }}>
+      <StatusBar barStyle="light-content" backgroundColor="#03045e" />
       {/* Header */}
-      <View className="px-5 py-4 flex-row items-center border-b border-[#1C1C1E]">
-        <TouchableOpacity onPress={() => router.back()} className="p-2 -ml-2">
+      <View style={{ paddingHorizontal: 20, paddingVertical: 16, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#0077b6' }}>
+        <TouchableOpacity onPress={() => router.back()} style={{ padding: 8, marginLeft: -8 }}>
           <ArrowLeft size={24} color="#FFF" />
         </TouchableOpacity>
-        <Text className="text-xl font-bold flex-1 text-center mr-6 text-white">Add Transaction</Text>
+        <Text style={{ fontSize: 18, fontWeight: 'bold', flex: 1, textAlign: 'center', marginRight: 24, color: 'white' }}>Add Transaction</Text>
       </View>
 
-      <ScrollView className="flex-1 px-5 pt-6" showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ flex: 1, paddingHorizontal: 20, paddingTop: 24 }} showsVerticalScrollIndicator={false}>
         {/* Amount Input */}
-        <View className="items-center mb-10">
-          <Text className="text-gray-400 mb-2 font-medium">Amount</Text>
-          <View className="flex-row items-center">
-            <Text className="text-4xl font-bold text-white mr-1">₹</Text>
+        <View style={{ alignItems: 'center', marginBottom: 40 }}>
+          <Text style={{ color: '#6B7280', marginBottom: 12, fontWeight: '500' }}>Amount</Text>
+          <View style={{ backgroundColor: '#0077b6', borderRadius: 12, borderWidth: 1, borderColor: '#00b4d8', paddingHorizontal: 16, paddingVertical: 12, flexDirection: 'row', alignItems: 'center', width: '100%' }}>
+            <Text style={{ fontSize: 36, fontWeight: '700', color: '#caf0f8', marginRight: 8 }}>₹</Text>
             <TextInput
-              className="text-5xl font-extrabold text-[#007AFF]"
+              style={{ flex: 1, fontSize: 32, fontWeight: '700', color: '#00b4d8' }}
               placeholder="0.00"
-              placeholderTextColor="#2A2A2D"
+              placeholderTextColor="#90e0ef"
               keyboardType="numeric"
               value={amount}
               onChangeText={setAmount}
@@ -68,35 +68,43 @@ export default function AddExpense() {
         </View>
 
         {/* Category Picker */}
-        <View className="mb-8">
-          <View className="flex-row items-center mb-3">
-            <Tag size={18} color="#9CA3AF" className="mr-2" />
-            <Text className="text-gray-300 font-semibold text-base">Category</Text>
+        <View style={{ marginBottom: 32 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+            <Tag size={18} color="#9CA3AF" style={{ marginRight: 8 }} />
+            <Text style={{ color: '#E5E7EB', fontWeight: '600', fontSize: 16 }}>Category</Text>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexDirection: 'row' }}>
             {CATEGORIES.map(cat => (
               <TouchableOpacity
                 key={cat}
                 onPress={() => setCategory(cat)}
-                className={`py-2 px-5 rounded-full mr-3 border ${category === cat ? 'bg-[#007AFF] border-[#007AFF]' : 'bg-[#1C1C1E] border-[#2A2A2D]'}`}
+                style={{
+                  paddingVertical: 8,
+                  paddingHorizontal: 20,
+                  borderRadius: 20,
+                  marginRight: 12,
+                  borderWidth: 1,
+                  backgroundColor: category === cat ? '#00b4d8' : '#0077b6',
+                  borderColor: category === cat ? '#00b4d8' : '#03045e'
+                }}
               >
-                <Text className={`${category === cat ? 'text-white' : 'text-gray-400'} font-medium`}>{cat}</Text>
+                <Text style={{ color: category === cat ? '#03045e' : '#90e0ef', fontWeight: '500' }}>{cat}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
 
         {/* Note Input */}
-        <View className="mb-10">
-          <View className="flex-row items-center mb-3">
-            <AlignLeft size={18} color="#9CA3AF" className="mr-2" />
-            <Text className="text-gray-300 font-semibold text-base">Description</Text>
+        <View style={{ marginBottom: 40 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+            <AlignLeft size={18} color="#9CA3AF" style={{ marginRight: 8 }} />
+            <Text style={{ color: '#E5E7EB', fontWeight: '600', fontSize: 16 }}>Description</Text>
           </View>
-          <View className="bg-[#1C1C1E] rounded-xl border border-[#2A2A2D]">
+          <View style={{ backgroundColor: '#0077b6', borderRadius: 12, borderWidth: 1, borderColor: '#00b4d8' }}>
             <TextInput
-              className="px-4 py-4 text-white text-base"
+              style={{ paddingHorizontal: 16, paddingVertical: 16, color: '#caf0f8', fontSize: 16, outlineStyle: 'none' }}
               placeholder="Write a note (optional)"
-              placeholderTextColor="#6B7280"
+              placeholderTextColor="#90e0ef"
               multiline
               numberOfLines={3}
               textAlignVertical="top"
@@ -107,14 +115,13 @@ export default function AddExpense() {
         </View>
 
         <TouchableOpacity
-          className="bg-[#007AFF] rounded-full py-4 flex-row justify-center items-center shadow-lg"
-          style={{ shadowColor: '#007AFF', elevation: 4 }}
+          style={{ backgroundColor: '#00b4d8', borderRadius: 50, paddingVertical: 16, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', shadowColor: '#00b4d8', shadowOpacity: 0.4, shadowRadius: 8, elevation: 8 }}
           onPress={handleSave}
           disabled={loading}
         >
-          {loading ? <ActivityIndicator color="#fff" /> : <Text className="text-white font-bold text-lg">Save Transaction</Text>}
+          {loading ? <ActivityIndicator color="#03045e" /> : <Text style={{ color: '#03045e', fontWeight: 'bold', fontSize: 18 }}>Save Transaction</Text>}
         </TouchableOpacity>
-        <View className="h-10" />
+        <View style={{ height: 40 }} />
       </ScrollView>
     </SafeAreaView>
   );

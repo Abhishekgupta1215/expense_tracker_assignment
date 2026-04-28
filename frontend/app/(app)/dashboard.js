@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity,
-  RefreshControl, StatusBar, Image, StyleSheet
+  RefreshControl, StatusBar, Image, StyleSheet, Alert
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ExpenseContext } from '../../context/ExpenseContext';
@@ -25,7 +25,23 @@ export default function Dashboard() {
   };
 
   const handleDelete = async (id) => {
-    await deleteExpense(id);
+    console.log('Dashboard: handleDelete called with ID:', id);
+    try {
+      console.log('Dashboard: Calling deleteExpense');
+      const res = await deleteExpense(id);
+      console.log('Dashboard: Delete response:', res);
+      
+      if (!res?.success) {
+        console.error('Dashboard: Delete failed:', res?.error);
+        const errorMsg = res?.error || 'Failed to delete transaction';
+        Alert.alert('Delete Error', errorMsg);
+      } else {
+        console.log('✅ Dashboard: Transaction deleted successfully');
+      }
+    } catch (err) {
+      console.error('Dashboard: Unexpected delete error:', err);
+      Alert.alert('Error', err.message || 'Failed to delete transaction. Please try again.');
+    }
   };
 
   const totalExpense = Object.values(summary).reduce((acc, curr) => acc + curr, 0);
@@ -45,8 +61,8 @@ export default function Dashboard() {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#121212' }}>
-      <StatusBar barStyle="light-content" backgroundColor="#121212" />
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#03045e' }}>
+      <StatusBar barStyle="light-content" backgroundColor="#03045e" />
 
       {/* Header */}
       <View style={styles.header}>
@@ -64,7 +80,7 @@ export default function Dashboard() {
           <LinearGradient
             style={styles.card}
             start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-            colors={['#0082c8', '#007AFF', '#007AFF', '#0082c8']}
+            colors={['#0077b6', '#00b4d8', '#00b4d8', '#0077b6']}
           >
             <View style={{ flex: 1, justifyContent: 'space-between' }}>
               <View>

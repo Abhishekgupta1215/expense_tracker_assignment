@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, ActivityIndicator, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -18,12 +18,6 @@ export default function EditExpense() {
   const [category, setCategory] = useState(expense ? expense.category : CATEGORIES[0]);
   const [note, setNote] = useState(expense && expense.note ? expense.note : '');
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (!expense) {
-      router.back();
-    }
-  }, [expense]);
 
   const handleUpdate = async () => {
     if (!amount || isNaN(amount)) {
@@ -47,6 +41,7 @@ export default function EditExpense() {
   };
 
   const handleDelete = () => {
+    console.log('Delete button clicked for expense:', id);
     Alert.alert(
       'Delete Transaction',
       'Are you sure you want to delete this specific transaction?',
@@ -56,13 +51,24 @@ export default function EditExpense() {
           text: 'Delete', 
           style: 'destructive',
           onPress: async () => {
+            console.log('Delete confirmed for expense:', id);
             setLoading(true);
-            const res = await deleteExpense(id);
-            if (res.success) {
-              router.back();
-            } else {
+            try {
+              const res = await deleteExpense(id);
+              console.log('Delete response:', res);
+              if (res.success) {
+                Alert.alert('Success', 'Transaction deleted successfully');
+                setTimeout(() => {
+                  router.back();
+                }, 800);
+              } else {
+                setLoading(false);
+                Alert.alert('Error', res.error || 'Failed to delete expense');
+              }
+            } catch (err) {
               setLoading(false);
-              Alert.alert('Error', res.error || 'Failed to delete expense');
+              console.error('Delete error caught:', err);
+              Alert.alert('Error', 'Failed to delete expense. Please try again.');
             }
           }
         }
@@ -70,32 +76,50 @@ export default function EditExpense() {
     );
   };
 
-  if (!expense) return null;
+  if (!expense) {
+    console.log('Expense not found. ID:', id, 'Available expenses:', expenses.map(e => e._id));
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#121212' }}>
+        <View style={{ paddingHorizontal: 20, paddingVertical: 16, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#1C1C1E' }}>
+          <TouchableOpacity onPress={() => router.back()} style={{ padding: 8, marginLeft: -8 }}>
+            <ArrowLeft size={24} color="#FFF" />
+          </TouchableOpacity>
+          <Text style={{ fontSize: 18, fontWeight: 'bold', flex: 1, textAlign: 'center', marginRight: 24, color: 'white' }}>Edit Transaction</Text>
+        </View>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 }}>
+          <Text style={{ color: '#caf0f8', fontSize: 16, textAlign: 'center' }}>Transaction not found</Text>
+          <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 20, paddingHorizontal: 20, paddingVertical: 12, backgroundColor: '#00b4d8', borderRadius: 8 }}>
+            <Text style={{ color: '#03045e', fontWeight: 'bold' }}>Go Back</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
-    <SafeAreaView className="flex-1 bg-[#121212]">
-      <StatusBar barStyle="light-content" backgroundColor="#121212" />
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#03045e' }}>
+      <StatusBar barStyle="light-content" backgroundColor="#03045e" />
       {/* Header */}
-      <View className="px-5 py-4 flex-row items-center border-b border-[#1C1C1E] justify-between">
-        <TouchableOpacity onPress={() => router.back()} className="p-2 -ml-2">
+      <View style={{ paddingHorizontal: 20, paddingVertical: 16, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#0077b6', justifyContent: 'space-between' }}>
+        <TouchableOpacity onPress={() => router.back()} style={{ padding: 8, marginLeft: -8 }}>
           <ArrowLeft size={24} color="#FFF" />
         </TouchableOpacity>
-        <Text className="text-xl font-bold text-white">Edit Transaction</Text>
-        <TouchableOpacity onPress={handleDelete} className="p-2 -mr-2 bg-[#FA4A4D]/10 rounded-full">
-          <Trash2 size={20} color="#FA4A4D" />
+        <Text style={{ fontSize: 18, fontWeight: 'bold', color: 'white' }}>Edit Transaction</Text>
+        <TouchableOpacity onPress={handleDelete} disabled={loading} style={{ padding: 8, marginRight: -8, backgroundColor: '#FA4A4D15', borderRadius: 50, opacity: loading ? 0.5 : 1 }}>
+          {loading ? <ActivityIndicator color="#FA4A4D" /> : <Trash2 size={20} color="#FA4A4D" />}
         </TouchableOpacity>
       </View>
 
-      <ScrollView className="flex-1 px-5 pt-6" showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ flex: 1, paddingHorizontal: 20, paddingTop: 24 }} showsVerticalScrollIndicator={false}>
         {/* Amount Input */}
-        <View className="items-center mb-10">
-          <Text className="text-gray-400 mb-2 font-medium">Amount</Text>
-          <View className="flex-row items-center">
-            <Text className="text-4xl font-bold text-white mr-1">₹</Text>
+        <View style={{ alignItems: 'center', marginBottom: 40 }}>
+          <Text style={{ color: '#6B7280', marginBottom: 12, fontWeight: '500' }}>Amount</Text>
+          <View style={{ backgroundColor: '#0077b6', borderRadius: 12, borderWidth: 1, borderColor: '#00b4d8', paddingHorizontal: 16, paddingVertical: 12, flexDirection: 'row', alignItems: 'center', width: '100%' }}>
+            <Text style={{ fontSize: 36, fontWeight: '700', color: '#caf0f8', marginRight: 8 }}>₹</Text>
             <TextInput
-              className="text-5xl font-extrabold text-[#007AFF]"
+              style={{ flex: 1, fontSize: 32, fontWeight: '700', color: '#00b4d8' }}
               placeholder="0.00"
-              placeholderTextColor="#2A2A2D"
+              placeholderTextColor="#90e0ef"
               keyboardType="numeric"
               value={amount}
               onChangeText={setAmount}
@@ -104,35 +128,43 @@ export default function EditExpense() {
         </View>
 
         {/* Category Picker */}
-        <View className="mb-8">
-          <View className="flex-row items-center mb-3">
-            <Tag size={18} color="#9CA3AF" className="mr-2" />
-            <Text className="text-gray-300 font-semibold text-base">Category</Text>
+        <View style={{ marginBottom: 32 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+            <Tag size={18} color="#9CA3AF" style={{ marginRight: 8 }} />
+            <Text style={{ color: '#E5E7EB', fontWeight: '600', fontSize: 16 }}>Category</Text>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexDirection: 'row' }}>
             {CATEGORIES.map(cat => (
               <TouchableOpacity
                 key={cat}
                 onPress={() => setCategory(cat)}
-                className={`py-2 px-5 rounded-full mr-3 border ${category === cat ? 'bg-[#007AFF] border-[#007AFF]' : 'bg-[#1C1C1E] border-[#2A2A2D]'}`}
+                style={{
+                  paddingVertical: 8,
+                  paddingHorizontal: 20,
+                  borderRadius: 20,
+                  marginRight: 12,
+                  borderWidth: 1,
+                  backgroundColor: category === cat ? '#00b4d8' : '#0077b6',
+                  borderColor: category === cat ? '#00b4d8' : '#03045e'
+                }}
               >
-                <Text className={`${category === cat ? 'text-white' : 'text-gray-400'} font-medium`}>{cat}</Text>
+                <Text style={{ color: category === cat ? '#03045e' : '#90e0ef', fontWeight: '500' }}>{cat}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
 
         {/* Note Input */}
-        <View className="mb-10">
-          <View className="flex-row items-center mb-3">
-            <AlignLeft size={18} color="#9CA3AF" className="mr-2" />
-            <Text className="text-gray-300 font-semibold text-base">Description</Text>
+        <View style={{ marginBottom: 40 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+            <AlignLeft size={18} color="#9CA3AF" style={{ marginRight: 8 }} />
+            <Text style={{ color: '#E5E7EB', fontWeight: '600', fontSize: 16 }}>Description</Text>
           </View>
-          <View className="bg-[#1C1C1E] rounded-xl border border-[#2A2A2D]">
+          <View style={{ backgroundColor: '#0077b6', borderRadius: 12, borderWidth: 1, borderColor: '#00b4d8' }}>
             <TextInput
-              className="px-4 py-4 text-white text-base"
+              style={{ paddingHorizontal: 16, paddingVertical: 16, color: '#caf0f8', fontSize: 16, outlineStyle: 'none' }}
               placeholder="Write a note (optional)"
-              placeholderTextColor="#6B7280"
+              placeholderTextColor="#90e0ef"
               multiline
               numberOfLines={3}
               textAlignVertical="top"
@@ -143,14 +175,13 @@ export default function EditExpense() {
         </View>
 
         <TouchableOpacity
-          className="bg-[#007AFF] rounded-full py-4 flex-row justify-center items-center shadow-lg"
-          style={{ shadowColor: '#007AFF', elevation: 4 }}
+          style={{ backgroundColor: '#00b4d8', borderRadius: 50, paddingVertical: 16, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', shadowColor: '#00b4d8', shadowOpacity: 0.4, shadowRadius: 8, elevation: 8 }}
           onPress={handleUpdate}
           disabled={loading}
         >
-          {loading ? <ActivityIndicator color="#fff" /> : <Text className="text-white font-bold text-lg">Update Transaction</Text>}
+          {loading ? <ActivityIndicator color="#03045e" /> : <Text style={{ color: '#03045e', fontWeight: 'bold', fontSize: 18 }}>Update Transaction</Text>}
         </TouchableOpacity>
-        <View className="h-10" />
+        <View style={{ height: 40 }} />
       </ScrollView>
     </SafeAreaView>
   );

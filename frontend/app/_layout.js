@@ -25,8 +25,8 @@ const InitialLayout = () => {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#121212' }}>
-        <ActivityIndicator size="large" color="#007AFF" />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#03045e' }}>
+        <ActivityIndicator size="large" color="#00b4d8" />
       </View>
     );
   }

@@ -67,12 +67,34 @@ export const ExpenseProvider = ({ children }) => {
 
   const deleteExpense = async (id) => {
     try {
-      await api.delete(`/expenses/${id}`);
-      setExpenses(expenses.filter(e => e._id !== id));
-      fetchSummary();
+      console.log('ExpenseContext: Deleting expense with ID:', id);
+      
+      // Optimistic update - remove card immediately from UI
+      const deletedExpense = expenses.find(e => e._id === id);
+      const updatedExpenses = expenses.filter(e => e._id !== id);
+      console.log('Optimistically removing expense from UI');
+      setExpenses(updatedExpenses);
+      
+      // Make API call
+      const response = await api.delete(`/expenses/${id}`);
+      console.log('Delete API response:', response.data);
+      
+      // Refresh summary
+      await fetchSummary();
+      console.log('Expense deleted successfully');
       return { success: true };
     } catch (err) {
-      return { success: false, error: err.message };
+      const errorMsg = err.response?.data?.msg || err.message || 'Unknown error';
+      console.error('Delete API error:', errorMsg);
+      
+      // Restore expense if API call failed
+      const deletedExpense = expenses.find(e => e._id === id);
+      if (deletedExpense) {
+        // Re-fetch to get fresh data
+        await fetchExpenses();
+      }
+      
+      return { success: false, error: errorMsg };
     }
   };
 
